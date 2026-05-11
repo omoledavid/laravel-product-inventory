@@ -10,4 +10,5 @@ Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn () => redirect()->route('admin.products.index'))->name('dashboard');
     Route::resource('products', Admin\ProductController::class)->except('show');
+    Route::resource('categories', Admin\CategoryController::class)->except('show');
 });

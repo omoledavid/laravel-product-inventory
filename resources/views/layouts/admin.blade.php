@@ -12,6 +12,7 @@
             <a href="{{ route('admin.dashboard') }}" class="text-lg font-semibold tracking-tight">Admin</a>
             <nav class="flex items-center gap-5 text-sm text-slate-500">
                 <a href="{{ route('admin.products.index') }}" class="hover:text-slate-900">Products</a>
+                <a href="{{ route('admin.categories.index') }}" class="hover:text-slate-900">Categories</a>
                 <a href="{{ route('products.index') }}" class="text-slate-400 hover:text-slate-700">View storefront &rarr;</a>
             </nav>
         </div>
