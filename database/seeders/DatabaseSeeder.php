@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $electronics = Category::factory()->create(['name' => 'Electronics', 'slug' => 'electronics']);
         $books = Category::factory()->create(['name' => 'Books', 'slug' => 'books']);
         $clothing = Category::factory()->create(['name' => 'Clothing', 'slug' => 'clothing']);
+        $home = Category::factory()->create(['name' => 'Home & Kitchen', 'slug' => 'home-kitchen']);
 
         Product::factory()->for($electronics)->withPercentDiscount(5)->create([
             'title' => 'Wireless Headphones',
@@ -51,5 +52,13 @@ class DatabaseSeeder extends Seeder
             'description' => 'Classic denim jacket with a modern fit.',
             'price_cents' => 7999,
         ]);
+
+        Product::factory()->count(10)->for($electronics)->create();
+        Product::factory()->count(8)->for($books)->create();
+        Product::factory()->count(8)->for($clothing)->create();
+        Product::factory()->count(10)->for($home)->create();
+
+        Product::factory()->count(5)->for($home)->withPercentDiscount(10)->create();
+        Product::factory()->count(3)->for($electronics)->withFixedDiscount(1000)->create();
     }
 }

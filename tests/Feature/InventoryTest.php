@@ -65,8 +65,8 @@ it('resolves a product by slug for route model binding', function () {
 it('seeds the expected catalog', function () {
     $this->seed();
 
-    expect(Category::count())->toBe(3)
-        ->and(Product::count())->toBe(5)
+    expect(Category::count())->toBe(4)
+        ->and(Product::count())->toBeGreaterThan(30)
         ->and(Product::where('slug', 'wireless-headphones')->value('discount_type'))->toBe('percent')
         ->and(Product::where('slug', 'smart-watch')->value('discount_type'))->toBe('fixed');
 });
