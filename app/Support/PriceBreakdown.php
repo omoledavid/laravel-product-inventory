@@ -6,19 +6,14 @@ final readonly class PriceBreakdown
 {
     public function __construct(
         public int $originalCents,
-        public int $categoryDiscountCents,
-        public int $customerDiscountCents,
+        public int $discountCents,
         public int $finalCents,
+        public ?string $discountLabel = null,
     ) {}
-
-    public function totalDiscountCents(): int
-    {
-        return $this->categoryDiscountCents + $this->customerDiscountCents;
-    }
 
     public function hasDiscount(): bool
     {
-        return $this->totalDiscountCents() > 0;
+        return $this->discountCents > 0;
     }
 
     public function original(): string
@@ -26,14 +21,9 @@ final readonly class PriceBreakdown
         return self::format($this->originalCents);
     }
 
-    public function categoryDiscount(): string
+    public function discount(): string
     {
-        return self::format($this->categoryDiscountCents);
-    }
-
-    public function customerDiscount(): string
-    {
-        return self::format($this->customerDiscountCents);
+        return self::format($this->discountCents);
     }
 
     public function final(): string

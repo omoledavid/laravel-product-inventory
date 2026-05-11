@@ -1,16 +1,14 @@
 <?php
 
 use App\Models\Category;
-use App\Models\Customer;
 use App\Models\Product;
 
 it('creates a product belonging to a category', function () {
-    $category = Category::factory()->withDiscount(5)->create(['slug' => 'electronics']);
+    $category = Category::factory()->create(['slug' => 'electronics']);
     $product = Product::factory()->for($category)->create(['price_cents' => 19999]);
 
     expect($product->category)->toBeInstanceOf(Category::class)
         ->and($product->category->slug)->toBe('electronics')
-        ->and((float) $product->category->discount_percent)->toBe(5.00)
         ->and($product->price_cents)->toBe(19999);
 });
 
@@ -21,7 +19,7 @@ it('exposes products via the category relationship', function () {
     expect($category->products)->toHaveCount(3);
 });
 
-it('nulls the category_id on a product when its category is deleted', function () {
+it('nulls the category_id when its category is deleted', function () {
     $category = Category::factory()->create();
     $product = Product::factory()->for($category)->create();
 
@@ -30,16 +28,20 @@ it('nulls the category_id on a product when its category is deleted', function (
     expect($product->fresh()->category_id)->toBeNull();
 });
 
-it('creates a special customer with a discount', function () {
-    $customer = Customer::factory()->special(10)->create();
+it('persists percentage discount fields', function () {
+    $product = Product::factory()->withPercentDiscount(10)->create();
 
-    expect((float) $customer->discount_percent)->toBe(10.00);
+    expect($product->discount_type)->toBe('percent')
+        ->and((float) $product->discount_percent)->toBe(10.00)
+        ->and($product->discount_amount_cents)->toBeNull();
 });
 
-it('creates a regular customer with no discount', function () {
-    $customer = Customer::factory()->create();
+it('persists fixed discount fields', function () {
+    $product = Product::factory()->withFixedDiscount(500)->create();
 
-    expect($customer->discount_percent)->toBeNull();
+    expect($product->discount_type)->toBe('fixed')
+        ->and($product->discount_amount_cents)->toBe(500)
+        ->and($product->discount_percent)->toBeNull();
 });
 
 it('enforces unique slugs on categories and products', function () {
@@ -65,7 +67,6 @@ it('seeds the expected catalog', function () {
 
     expect(Category::count())->toBe(3)
         ->and(Product::count())->toBe(5)
-        ->and(Customer::count())->toBe(2)
-        ->and(Category::where('slug', 'electronics')->value('discount_percent'))->toEqual('5.00')
-        ->and(Customer::where('email', 'john@example.com')->value('discount_percent'))->toEqual('10.00');
+        ->and(Product::where('slug', 'wireless-headphones')->value('discount_type'))->toBe('percent')
+        ->and(Product::where('slug', 'smart-watch')->value('discount_type'))->toBe('fixed');
 });

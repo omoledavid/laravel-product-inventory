@@ -12,8 +12,9 @@
             <a href="{{ route('products.index') }}" class="text-lg font-semibold tracking-tight">
                 {{ config('app.name') }}
             </a>
-            <nav class="text-sm text-slate-500">
+            <nav class="flex items-center gap-5 text-sm text-slate-500">
                 <a href="{{ route('products.index') }}" class="hover:text-slate-900">Products</a>
+                <a href="{{ route('admin.dashboard') }}" class="hover:text-slate-900">Admin</a>
             </nav>
         </div>
     </header>

@@ -18,12 +18,6 @@ class CategoryFactory extends Factory
         return [
             'name' => ucwords($name),
             'slug' => Str::slug($name),
-            'discount_percent' => null,
         ];
-    }
-
-    public function withDiscount(float $percent): self
-    {
-        return $this->state(fn () => ['discount_percent' => $percent]);
     }
 }

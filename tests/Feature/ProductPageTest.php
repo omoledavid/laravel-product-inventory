@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Category;
-use App\Models\Customer;
 use App\Models\Product;
 
 it('renders the product index listing all products', function () {
@@ -28,16 +27,16 @@ it('shows a product page by slug', function () {
         ->assertOk()
         ->assertSee('Wireless Headphones')
         ->assertSee('Noise-cancelling.')
-        ->assertSee('$199.99');
+        ->assertSee('$199.99')
+        ->assertDontSee('Customer');
 });
 
 it('returns 404 for an unknown product slug', function () {
     $this->get('/products/does-not-exist')->assertNotFound();
 });
 
-it('applies the category discount on the show page', function () {
-    $category = Category::factory()->withDiscount(5)->create(['name' => 'Electronics']);
-    $product = Product::factory()->for($category)->create([
+it('shows the percentage discount and final price', function () {
+    $product = Product::factory()->withPercentDiscount(5)->create([
         'slug' => 'tv',
         'price_cents' => 20000,
     ]);
@@ -46,41 +45,27 @@ it('applies the category discount on the show page', function () {
         ->assertOk()
         ->assertSee('$200.00')
         ->assertSee('$190.00')
-        ->assertSee('Category discount');
+        ->assertSee('5% off');
 });
 
-it('stacks category and customer discounts when a customer is selected', function () {
-    $category = Category::factory()->withDiscount(5)->create();
-    $product = Product::factory()->for($category)->create([
+it('shows the fixed-amount discount and final price', function () {
+    $product = Product::factory()->withFixedDiscount(2500)->create([
         'slug' => 'phone',
         'price_cents' => 20000,
     ]);
-    $customer = Customer::factory()->special(10)->create();
-
-    $this->get(route('products.show', $product).'?customer='.$customer->id)
-        ->assertOk()
-        ->assertSee('$200.00')
-        ->assertSee('Category discount')
-        ->assertSee('Customer discount')
-        ->assertSee('$171.00');
-});
-
-it('ignores an invalid customer id query param', function () {
-    $product = Product::factory()->create(['slug' => 'item', 'price_cents' => 10000]);
-
-    $this->get(route('products.show', $product).'?customer=99999')
-        ->assertOk()
-        ->assertSee('$100.00')
-        ->assertDontSee('Customer discount');
-});
-
-it('lists every customer in the selector', function () {
-    $product = Product::factory()->create();
-    $regular = Customer::factory()->create(['name' => 'Regular Jane']);
-    $vip = Customer::factory()->special(10)->create(['name' => 'VIP John']);
 
     $this->get(route('products.show', $product))
         ->assertOk()
-        ->assertSee('Regular Jane')
-        ->assertSee('VIP John');
+        ->assertSee('$200.00')
+        ->assertSee('$175.00')
+        ->assertSee('$25.00 off');
+});
+
+it('shows the category badge when present', function () {
+    $category = Category::factory()->create(['name' => 'Electronics']);
+    $product = Product::factory()->for($category)->create();
+
+    $this->get(route('products.show', $product))
+        ->assertOk()
+        ->assertSee('Electronics');
 });

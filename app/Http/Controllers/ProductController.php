@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Customer;
 use App\Models\Product;
 use App\Services\PricingEngine;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -22,22 +20,13 @@ class ProductController extends Controller
         ]);
     }
 
-    public function show(Request $request, Product $product): View
+    public function show(Product $product): View
     {
         $product->load('category');
 
-        $customers = Customer::orderBy('name')->get();
-        $selectedCustomer = $request->filled('customer')
-            ? $customers->firstWhere('id', (int) $request->query('customer'))
-            : null;
-
-        $breakdown = $this->pricing->priceFor($product, $selectedCustomer);
-
         return view('products.show', [
             'product' => $product,
-            'customers' => $customers,
-            'selectedCustomer' => $selectedCustomer,
-            'breakdown' => $breakdown,
+            'breakdown' => $this->pricing->priceFor($product),
         ]);
     }
 }

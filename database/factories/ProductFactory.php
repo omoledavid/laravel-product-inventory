@@ -22,6 +22,27 @@ class ProductFactory extends Factory
             'slug' => Str::slug($title).'-'.Str::random(5),
             'description' => $this->faker->paragraph(),
             'price_cents' => $this->faker->numberBetween(999, 99999),
+            'discount_type' => null,
+            'discount_percent' => null,
+            'discount_amount_cents' => null,
         ];
+    }
+
+    public function withPercentDiscount(float $percent): self
+    {
+        return $this->state(fn () => [
+            'discount_type' => Product::DISCOUNT_PERCENT,
+            'discount_percent' => $percent,
+            'discount_amount_cents' => null,
+        ]);
+    }
+
+    public function withFixedDiscount(int $amountCents): self
+    {
+        return $this->state(fn () => [
+            'discount_type' => Product::DISCOUNT_FIXED,
+            'discount_percent' => null,
+            'discount_amount_cents' => $amountCents,
+        ]);
     }
 }
